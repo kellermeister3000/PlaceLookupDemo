@@ -10,12 +10,32 @@ import MapKit
 
 struct ContentView: View {
     @EnvironmentObject var locationManager: LocationManager
+    @State private var showPlaceLookupSheet = false
+    @State var returnedPlace = Place(mapItem: MKMapItem())
+    
     var body: some View {
-        VStack (alignment: .leading) {
-            Text("Location:\n\(locationManager.location?.coordinate.latitude ?? 0.0), \(locationManager.location?.coordinate.longitude ?? 0.0)")
-                .padding(.bottom)
+        NavigationStack {
+            VStack (alignment: .leading) {
+                Text("Location:\n\(locationManager.location?.coordinate.latitude ?? 0.0), \(locationManager.location?.coordinate.longitude ?? 0.0)")
+                    .padding(.bottom)
+                
+                Text("Returned Place: \nName: \(returnedPlace.name) \nAddress:\(returnedPlace.address)\nCoords: \(returnedPlace.latitude), \(returnedPlace.longitude)")
+            }
+            .padding()
+            .toolbar {
+                ToolbarItem(placement: .bottomBar) {
+                    Button {
+                        showPlaceLookupSheet.toggle()
+                    } label: {
+                        Image(systemName: "magnifyingglass")
+                        Text("Lookup Place")
+                    }
+                }
+            }
         }
-        .padding()
+        .fullScreenCover(isPresented: $showPlaceLookupSheet) {
+            PlaceLookupView(returnedPlace: $returnedPlace)
+        }
     }
 }
 
